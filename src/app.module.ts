@@ -13,11 +13,21 @@ import mongoose from 'mongoose';
 import slugUpdater from 'mongoose-slug-updater';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 mongoose.plugin(slugUpdater);
 
 @Module({
   imports: [
+    /**
+     * Set file tĩnh
+     * Thuộc tính serveRoot giúp app có thể set file tĩnh nhưng vẫn có thể trả api
+     */
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/static',
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
