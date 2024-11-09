@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { WithdrawsModule } from './modules/withdraws/withdraws.module';
@@ -12,8 +10,11 @@ import { DepositsModule } from './modules/deposits/deposits.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { RolesModule } from './modules/roles/roles.module';
 import mongoose from 'mongoose';
+import slugUpdater from 'mongoose-slug-updater';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+mongoose.plugin(slugUpdater);
 
 @Module({
   imports: [
@@ -46,7 +47,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     FavoritesModule, 
     RolesModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
