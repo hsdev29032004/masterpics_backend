@@ -10,7 +10,7 @@ import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, CloudinaryService, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   imports: [
     UsersModule, 
     PassportModule,

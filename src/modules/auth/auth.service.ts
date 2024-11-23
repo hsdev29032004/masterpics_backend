@@ -28,9 +28,12 @@ export class AuthService {
     }
 
     async login(
-        user: any,
+        user: IUser,
         response: any,
     ) {
+        if(user.banned){
+            return sendResponse("error", "Tài khoản bị cấm", null)
+        }
         let access_token = this.createAccessToken(user)
         let refresh_token = this.createRefreshToken(user)
 
@@ -45,11 +48,11 @@ export class AuthService {
             httpOnly: true,
             maxAge: this.configService.get<number>("REFRESHTOKEN_EXPIRE") * 1000
         })
-        return {
+        return sendResponse("success", "Đăng nhập thành công", {
             access_token,
             refresh_token,
             user
-        }
+        })
     }
 
     register(registerUserDto: RegisterUserDto) {

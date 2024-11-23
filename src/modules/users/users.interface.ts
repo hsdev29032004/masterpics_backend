@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { IRole } from '../roles/roles.interface';
 
 export interface IUser {

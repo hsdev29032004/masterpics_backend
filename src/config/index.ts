@@ -1,5 +1,3 @@
-import { Response } from "express"
-
 const CONFIG_PERMISSIONS = {
     POST: {
         GET: "getPost",
@@ -44,8 +42,8 @@ const CONFIG_ACCOUNT_TYPE = {
     GMAIL: "GMAIL"
 }
 
-const sendResponse = (status: string, msg: string, data: any) => {
-    return {status, msg, data}
+const sendResponse = (status: string, message: string, data: any) => {
+    return {status, message, data}
 }
 
 export {CONFIG_ACCOUNT_TYPE, CONFIG_PERMISSIONS, sendResponse}

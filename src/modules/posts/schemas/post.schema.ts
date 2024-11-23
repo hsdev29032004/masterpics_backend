@@ -29,7 +29,7 @@ export class Post {
     image: string
 
     @Prop()
-    watermask: string
+    watermark: string
 
     @Prop({default: 0})
     quantityBuy: number

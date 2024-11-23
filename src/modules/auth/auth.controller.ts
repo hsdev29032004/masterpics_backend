@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Res, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, UseGuards, Res, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from 'src/common/guards/local-auth.gaurd';
-import { Public, Require, User } from 'src/common/decorators/customise.decorator';
+import { Public, User } from 'src/common/decorators/customise.decorator';
 import { Request, Response } from 'express';
-import { CONFIG_PERMISSIONS } from 'src/config';
 import { RegisterUserDto } from '../users/dto/create-user.dto';
 import { IUser } from '../users/users.interface';
 // import { CloudinaryService } from '../cloudinary/cloudinary.service';
@@ -22,13 +21,6 @@ export class AuthController {
   //   return this.cloudinaryService.uploadFile(file);
   // }
 
-  // @Get('')
-  // @Require(CONFIG_PERMISSIONS.USER.GET)
-  // // @Public()
-  // ok(@Req() req) {
-  //   return req.user
-  // }
-
   // [POST]: /api/auth/login
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -41,6 +33,7 @@ export class AuthController {
     return this.authService.login(req.user, response);
   }
 
+  // [POST]: /api/auth/register
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
@@ -48,14 +41,7 @@ export class AuthController {
     return this.authService.register(registerUserDto)
   }
 
-  @HttpCode(HttpStatus.CREATED)
-  @Public()
-  @Post('/refresh')
-  refreshToken(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
-    const refreshToken = request.cookies["refresh_token"] || request.headers["authorization"]?.split(" ")[1];
-    return this.authService.refresh(refreshToken, response)
-  }
-
+  // [POST]: /api/auth/logout
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   handleLogout(
@@ -63,5 +49,14 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.logout(user, res)
+  }
+
+  // [POST]: /api/auth/refresh
+  @HttpCode(HttpStatus.CREATED)
+  @Public()
+  @Post('/refresh')
+  refreshToken(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
+    const refreshToken = request.cookies["refresh_token"] || request.headers["authorization"]?.split(" ")[1];
+    return this.authService.refresh(refreshToken, response)
   }
 }
