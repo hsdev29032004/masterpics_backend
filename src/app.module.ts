@@ -10,16 +10,22 @@ import { DepositsModule } from './modules/deposits/deposits.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { RolesModule } from './modules/roles/roles.module';
 import mongoose from 'mongoose';
-import slugUpdater from 'mongoose-slug-updater';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import * as slug from 'mongoose-slug-updater';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './common/guards/jwt-auth.gaurd';
+import { PermissionsGuard } from './common/guards/permission.gaurd';
 
-mongoose.plugin(slugUpdater);
+mongoose.plugin(slug);
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     /**
      * Set file tĩnh
      * Thuộc tính serveRoot giúp app có thể set file tĩnh nhưng vẫn có thể trả api
@@ -43,9 +49,6 @@ mongoose.plugin(slugUpdater);
       },
       inject: [ConfigService],
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     UsersModule, 
     PaymentsModule, 
     WithdrawsModule, 
@@ -58,6 +61,13 @@ mongoose.plugin(slugUpdater);
     RolesModule
   ],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  },
+  {
+    provide: APP_GUARD,
+    useClass: PermissionsGuard,
+  },],
 })
 export class AppModule {}
