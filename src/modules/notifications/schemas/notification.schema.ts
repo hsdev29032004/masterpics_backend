@@ -8,7 +8,7 @@ export type NotificationDocument = HydratedDocument<Notification>;
 @Schema({collection: "notifications", timestamps: true})
 export class Notification {
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name})
-    idUser: mongoose.Schema.Types.ObjectId
+    user: mongoose.Schema.Types.ObjectId
     
     @Prop()
     link: string

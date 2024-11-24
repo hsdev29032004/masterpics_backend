@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseInterceptors, UploadedFile, BadRequestException, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Public, User } from 'src/common/decorators/customise.decorator';
@@ -12,6 +12,26 @@ export class PostsController {
   constructor(
     private readonly postsService: PostsService,
   ) { }
+
+  // [GET]: /api/posts?page=
+  @Get('')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  async getListPost(
+    @Query("page") page: number
+  ) {    
+    return this.postsService.getListPost(page < 1 ? 1 : page)
+  }
+
+  // [GET]: api/posts/follow?page=
+  @Get('follow')
+  @HttpCode(HttpStatus.OK)
+  async getListPostByFollow(
+    @Query("page") page: number,
+    @User() user: IUser
+  ) {    
+    return this.postsService.getListPostByFollow(page < 1 ? 1 : page, user)
+  }
 
   // [GET]: /api/posts/slug/:slug
   @Get('slug/:slug')

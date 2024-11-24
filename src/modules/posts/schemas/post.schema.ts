@@ -38,7 +38,7 @@ export class Post {
     deleted: boolean
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name})
-    idUser: mongoose.Schema.Types.ObjectId
+    user: mongoose.Schema.Types.ObjectId
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

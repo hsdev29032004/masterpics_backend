@@ -16,6 +16,46 @@ export class PostsService {
     private readonly cloudinaryService: CloudinaryService,
   ) { }
 
+  async getListPost(page: number){    
+    let limit = 5
+    const totalPost = await this.postModel.countDocuments({deleted: false})
+
+    const posts = await this.postModel.find({deleted: false})
+      .populate({
+        path: "user",
+        select: "slug fullName avatar"
+      })
+      .select("-image")
+      .sort({createdAt: -1})
+      .limit(limit)
+      .skip((page-1)*limit)
+    
+    return sendResponse("success", "Lấy danh sách bài viết thành công", {posts, totalPage: Math.ceil(totalPost / limit)})
+  }
+
+  async getListPostByFollow(page: number, user: IUser){    
+    let limit = 5
+    const totalPost = await this.postModel.countDocuments({
+      deleted: false,
+      user: { $in: user.follow }
+    })
+
+    const posts = await this.postModel.find({
+      deleted: false, 
+      user: {$in: user.follow}
+    })
+      .populate({
+        path: "user",
+        select: "slug fullName avatar"
+      })
+      .select("-image")
+      .sort({createdAt: -1})
+      .limit(limit)
+      .skip((page-1)*limit)
+    
+    return sendResponse("success", "Lấy danh sách bài viết thành công", {posts, totalPage: Math.ceil(totalPost / limit)})
+  }
+
   async findByslug(slug: string) {
     const post = await this.postModel.findOne({ slug: slug, deleted: false }).select("-image")
     if (post) {
@@ -25,7 +65,7 @@ export class PostsService {
   }
 
   async findByIdUser(id: string) {
-    const posts = await this.postModel.find({ idUser: id, deleted: false }).select("-image")
+    const posts = await this.postModel.find({ user: id, deleted: false }).select("-image")
     return sendResponse("success", "Lấy bài viết thành công", posts)
   }
 
@@ -72,7 +112,7 @@ export class PostsService {
     } as Express.Multer.File
 
     const watermarkUpload = await this.cloudinaryService.uploadFile(fakeFile)
-    const post = await this.postModel.create({ title, description, price, image: originalImageResult.url, watermark: watermarkUpload.url, idUser: user._id })
+    const post = await this.postModel.create({ title, description, price, image: originalImageResult.url, watermark: watermarkUpload.url, user: user._id })
     return sendResponse("success", "Tạo mới bài viết thành công", post)
   }
 
@@ -85,7 +125,7 @@ export class PostsService {
     let post = await this.postModel.findOne({_id: id})
     if(!post){
       throw new NotFoundException(sendResponse("error", "Không tìm thấy bài viết", null))
-    }else if(user._id != post.idUser.toString()){
+    }else if(user._id != post.user.toString()){
       throw new ForbiddenException(sendResponse("error", "Bạn không có quyền thực hiện", null))
     }
 
@@ -138,7 +178,7 @@ export class PostsService {
   async deletePost(id: string, user: IUser) {
     let post = await this.postModel.findOne({ _id: id })
     if (post) {
-      if (user._id == post.idUser.toString() || user.role.permissions.includes(CONFIG_PERMISSIONS.POST.DELETE)) {
+      if (user._id == post.user.toString() || user.role.permissions.includes(CONFIG_PERMISSIONS.POST.DELETE)) {
         post.deleted = true
         await post.save()
         return sendResponse("success", "Xóa bài viết thành công", null)

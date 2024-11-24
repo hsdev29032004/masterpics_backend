@@ -8,10 +8,10 @@ export type FavoriteDocument = HydratedDocument<Favorite>;
 @Schema({collection: "favorites"})
 export class Favorite {
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name})
-    idUser: mongoose.Schema.Types.ObjectId
+    user: mongoose.Schema.Types.ObjectId
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: Post.name})
-    idPost: mongoose.Schema.Types.ObjectId
+    post: mongoose.Schema.Types.ObjectId
 }
 
 export const FavoriteSchema = SchemaFactory.createForClass(Favorite);

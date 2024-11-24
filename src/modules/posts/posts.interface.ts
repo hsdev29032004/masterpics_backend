@@ -8,6 +8,6 @@ export interface IPost {
     watermark: string;
     quantityBuy: number;
     deleted: boolean;
-    idUser: string;
+    user: string;
     createdAt: Date;
 }
