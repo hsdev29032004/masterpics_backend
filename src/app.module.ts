@@ -62,14 +62,5 @@ mongoose.plugin(slug);
     FavoritesModule, 
     RolesModule, SearchModule, HelperModule
   ],
-  controllers: [],
-  providers: [{
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard,
-  },
-  {
-    provide: APP_GUARD,
-    useClass: PermissionsGuard,
-  },],
 })
 export class AppModule {}

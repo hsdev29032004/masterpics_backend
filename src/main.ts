@@ -1,8 +1,10 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { JwtAuthGuard } from './common/guards/jwt-auth.gaurd';
+import { PermissionsGuard } from './common/guards/permission.gaurd';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +17,13 @@ async function bootstrap() {
     // whitelist: true,
     forbidNonWhitelisted: true,
   }));
+  
+  const reflector = app.get(Reflector)
+  app.useGlobalGuards(
+    new JwtAuthGuard(reflector), 
+    new PermissionsGuard(reflector)
+  )
+
 
   app.use(cors({
     origin: 'http://localhost:3000',
