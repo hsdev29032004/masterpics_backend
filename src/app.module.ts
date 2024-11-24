@@ -18,6 +18,8 @@ import * as slug from 'mongoose-slug-updater';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.gaurd';
 import { PermissionsGuard } from './common/guards/permission.gaurd';
+import { SearchModule } from './modules/search/search.module';
+import { HelperModule } from './modules/helper/helper.module';
 
 mongoose.plugin(slug);
 
@@ -58,7 +60,7 @@ mongoose.plugin(slug);
     PostsModule, 
     DepositsModule, 
     FavoritesModule, 
-    RolesModule
+    RolesModule, SearchModule, HelperModule
   ],
   controllers: [],
   providers: [{
