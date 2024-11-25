@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -10,6 +10,7 @@ import { sendResponse } from 'src/config';
 @Injectable()
 export class AuthService {
     constructor(
+        @Inject(forwardRef(() => UsersService))
         private usersService: UsersService,
         private jwtService: JwtService,
         private configService: ConfigService,
@@ -20,7 +21,7 @@ export class AuthService {
         if (user) {
             const isValid = this.usersService.comparePassword(pass, user.password);
             if (isValid) {
-                const { password, refreshToken, ...res } = user.toObject()
+                const { password, refreshToken, follow, ...res } = user.toObject()
                 return res
             }
         }
@@ -89,7 +90,7 @@ export class AuthService {
 
             let user = (await this.usersService.findUserByToken(refreshToken)).toObject()
             if (user) {
-                const { password, refreshToken, ...payload } = user
+                const { password, refreshToken, follow, ...payload } = user
                 const refresh_token = this.createRefreshToken(payload)
 
                 await this.usersService.updateUserToken(refresh_token, user._id.toString())
