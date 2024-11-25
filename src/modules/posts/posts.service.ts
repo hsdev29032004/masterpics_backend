@@ -4,16 +4,20 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post } from './schemas/post.schema';
 import { Model } from 'mongoose';
-import { CONFIG_PERMISSIONS, sendResponse } from 'src/config';
+import { CONFIG_ICON, CONFIG_PERMISSIONS, sendResponse } from 'src/config';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import * as sharp from 'sharp';
 import { IUser } from '../users/users.interface';
+import { FavoritesService } from '../favorites/favorites.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<Post>,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly favoriteService: FavoritesService,
+    private readonly notificationService: NotificationsService,
   ) { }
 
   async getListPost(page: number){    
@@ -113,6 +117,11 @@ export class PostsService {
 
     const watermarkUpload = await this.cloudinaryService.uploadFile(fakeFile)
     const post = await this.postModel.create({ title, description, price, image: originalImageResult.url, watermark: watermarkUpload.url, user: user._id })
+    
+    /**
+     * TRIGGER TẠO THÔNG BÁO CHO NGƯỜI THEO DÕI KHI ĐĂNG BÀI
+     */
+
     return sendResponse("success", "Tạo mới bài viết thành công", post)
   }
 
@@ -178,9 +187,30 @@ export class PostsService {
   async deletePost(id: string, user: IUser) {
     let post = await this.postModel.findOne({ _id: id })
     if (post) {
-      if (user._id == post.user.toString() || user.role.permissions.includes(CONFIG_PERMISSIONS.POST.DELETE)) {
+      if (user._id == post.user.toString()) {
         post.deleted = true
         await post.save()
+        /**
+         * TRIGGER XÓA TẤT CÁC CÁC BÀI VIẾT ĐƯỢC NGƯỜI DÙNG KHÁC YÊU THÍCH (KHÔNG XÓA Ở PAYMENT)
+         */
+        await this.favoriteService.deleteByIdPost(post._id.toString())
+        
+        return sendResponse("success", "Xóa bài viết thành công", null)
+      }else if(user.role.permissions.includes(CONFIG_PERMISSIONS.POST.DELETE)){
+        post.deleted = true
+        await post.save()
+
+        /**
+         * THÔNG BÁO CHO NGƯỜI DÙNG BỊ XÓA
+         */
+        this.notificationService.create(
+          "", 
+          CONFIG_ICON.DELETE, 
+          `Bài viết <b>${post.title}</b> của bạn bị xóa vì vi phạm tiêu chuẩn cộng đồng.`, 
+          post.user.toString()
+        )
+
+        await this.favoriteService.deleteByIdPost(post._id.toString())
         return sendResponse("success", "Xóa bài viết thành công", null)
       } else {
         throw new ForbiddenException(sendResponse("error", "Bạn không có quyền thực hiện", null))

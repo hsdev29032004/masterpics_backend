@@ -1,26 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { sendResponse } from 'src/config';
+import { Notification } from './schemas/notification.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class NotificationsService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
-  }
+  constructor(
+    @InjectModel(Notification.name) private notificationModel: Model<Notification>,
+  ){}
 
-  findAll() {
-    return `This action returns all notifications`;
-  }
+  async create(link: string, icon: string, content: string, idUser: string){
+    if(!content || !idUser){
+      throw new BadRequestException(sendResponse("error", "Thông báo thiếu thông tin", null))
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
-
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+    await this.notificationModel.create({link, icon, content, user: idUser})
   }
 }

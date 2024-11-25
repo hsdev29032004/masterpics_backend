@@ -42,8 +42,19 @@ const CONFIG_ACCOUNT_TYPE = {
     GMAIL: "GMAIL"
 }
 
+const CONFIG_ICON = {
+    PURCHASE: "fa-solid fa-cart-shopping",
+    POST: "fa-solid fa-newspaper",
+    DELETE: "fa-solid fa-trash",
+    WITHDRAW: "fa-duotone fa-regular fa-money-simple-from-bracket",
+    DEPOSIT: "fa-solid fa-money-bill-transfer",
+    FOLLOW: "fa-solid fa-users",
+    NOTIFY: "fa-solid fa-bell",
+    SYSTEM: "fa-solid fa-gear"
+}
+
 const sendResponse = (status: string, message: string, data: any) => {
     return {status, message, data}
 }
 
-export {CONFIG_ACCOUNT_TYPE, CONFIG_PERMISSIONS, sendResponse}
+export {CONFIG_ACCOUNT_TYPE, CONFIG_PERMISSIONS, CONFIG_ICON, sendResponse}

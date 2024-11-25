@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { CONFIG_PERMISSIONS } from 'src/config';
+import { CONFIG_ICON } from 'src/config';
 import { User } from 'src/modules/users/schemas/user.schema';
 
 export type NotificationDocument = HydratedDocument<Notification>;
@@ -18,6 +18,12 @@ export class Notification {
 
     @Prop({default: false})
     isRead: boolean
+
+    @Prop({
+        default: CONFIG_ICON.SYSTEM,
+        enum: Object.values(CONFIG_ICON)
+    })
+    icon: string
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification); 

@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Favorite } from './schemas/favorite.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class FavoritesService {
+  constructor(
+    @InjectModel(Favorite.name) private favoriteModel: Model<Favorite>,
+  ){}
   create(createFavoriteDto: CreateFavoriteDto) {
     return 'This action adds a new favorite';
   }
@@ -22,5 +28,9 @@ export class FavoritesService {
 
   remove(id: number) {
     return `This action removes a #${id} favorite`;
+  }
+
+  async deleteByIdPost(id: string){
+    await this.favoriteModel.deleteMany({post: id})
   }
 }
