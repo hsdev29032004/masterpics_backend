@@ -4,30 +4,40 @@ import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Favorite } from './schemas/favorite.schema';
 import { Model } from 'mongoose';
+import { sendResponse } from 'src/config';
 
 @Injectable()
 export class FavoritesService {
   constructor(
     @InjectModel(Favorite.name) private favoriteModel: Model<Favorite>,
   ){}
-  create(createFavoriteDto: CreateFavoriteDto) {
-    return 'This action adds a new favorite';
+
+  async getListFavorite(id: string){
+    const favorites = await this.favoriteModel.find({user: id})
+      .populate({
+        path: "post",
+        select: "-image",
+        populate: {
+          path: "user",
+          select: "fullName avatar slug"
+        }
+      })
+      
+    return sendResponse("success", "Lấy danh sách yêu thích thành công", favorites)
   }
 
-  findAll() {
-    return `This action returns all favorites`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
-  }
-
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} favorite`;
+  async likePost(idPost: string, idUser: string){
+    const favoriteRecord = await this.favoriteModel.findOne({
+      user: idUser,
+      post: idPost
+    })
+    if(favoriteRecord){
+      await favoriteRecord.deleteOne()
+      return sendResponse("success", "Xóa bài viết khỏi mục yêu thích thành công", null)
+    }else{
+      const favorite = await this.favoriteModel.create({user: idUser, post: idPost})
+      return sendResponse("success", "Thêm bài viết vào mục yêu thích thành công", favorite)
+    }
   }
 
   async deleteByIdPost(id: string){
