@@ -1,26 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateWithdrawDto } from './dto/create-withdraw.dto';
 import { UpdateWithdrawDto } from './dto/update-withdraw.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ObjectId } from 'mongoose';
+import { Withdraw } from './schemas/withdraw.schema';
+import { sendResponse } from 'src/config';
 
 @Injectable()
 export class WithdrawsService {
-  create(createWithdrawDto: CreateWithdrawDto) {
-    return 'This action adds a new withdraw';
+  constructor(
+    @InjectModel(Withdraw.name) private withdrawModel: Model<Withdraw>,
+  ){}
+
+  async findAll(status: string, user: string) {
+    let query: any = {}
+
+    if(status == "true"){
+      query.status = true
+    }else if(status == "false"){
+      query.status = false
+    }
+
+    if(user){
+      query.user = user
+    }
+
+
+    const withdraws = await this.withdrawModel
+    .find(query)
+    .sort({ createdAt: -1 })
+
+    return sendResponse("success", "Danh sách lệnh rút tiền", withdraws)
   }
 
-  findAll() {
-    return `This action returns all withdraws`;
+  async createWithdraw(money: number){
+    if(money < 10000){
+      throw new BadRequestException(sendResponse("error", "Nạp tối thiểu 10.000đ", null))
+    }
+
+    return "Nạp tiền"
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} withdraw`;
-  }
-
-  update(id: number, updateWithdrawDto: UpdateWithdrawDto) {
-    return `This action updates a #${id} withdraw`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} withdraw`;
+  async approveWithdraw(id: ObjectId){
+    await this.withdrawModel.updateOne({_id: id}, {status: true})
+    return sendResponse("success", "Duyệt thành công", null)
   }
 }

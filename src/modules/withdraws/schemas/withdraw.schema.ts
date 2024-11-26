@@ -15,6 +15,12 @@ export class Withdraw {
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name})
     user: mongoose.Schema.Types.ObjectId
+
+    @Prop({required: true})
+    bank: string
+
+    @Prop({required: true})
+    cardNumber: string
 }
 
 export const WithdrawSchema = SchemaFactory.createForClass(Withdraw);

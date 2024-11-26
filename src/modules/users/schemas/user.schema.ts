@@ -30,7 +30,7 @@ export class User {
     @Prop({required: true})
     fullName: string;
 
-    @Prop({default: 0})
+    @Prop({default: 1000003})
     money: number
 
     @Prop({
