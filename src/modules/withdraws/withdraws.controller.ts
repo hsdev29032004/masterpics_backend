@@ -2,9 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpCode, Htt
 import { WithdrawsService } from './withdraws.service';
 import { CreateWithdrawDto } from './dto/create-withdraw.dto';
 import { UpdateWithdrawDto } from './dto/update-withdraw.dto';
-import { Require } from 'src/common/decorators/customise.decorator';
+import { Require, User } from 'src/common/decorators/customise.decorator';
 import { CONFIG_PERMISSIONS } from 'src/config';
 import { ObjectId } from 'mongoose';
+import { IUser } from '../users/users.interface';
 
 @Controller('withdraws')
 export class WithdrawsController {
@@ -32,8 +33,19 @@ export class WithdrawsController {
   @Require(CONFIG_PERMISSIONS.WITHDRAW.UPDATE)
   @HttpCode(HttpStatus.OK)
   approveWithdraw(
-    @Param('id') id: ObjectId
+    @Param('id') id: ObjectId,
+    // @User() user: IUser
   ){
     return this.withdrawsService.approveWithdraw(id)
+  }
+
+  @Delete('refuse/:id')
+  @Require(CONFIG_PERMISSIONS.WITHDRAW.DELETE)
+  @HttpCode(HttpStatus.OK)
+  refuseWithdraw(
+    @Param('id') id: ObjectId,
+    // @User() user: IUser
+  ){
+    return this.withdrawsService.refuseWithdraw(id)
   }
 }

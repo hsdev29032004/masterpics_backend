@@ -18,7 +18,6 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly cloudinaryService: CloudinaryService,
     @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
     private readonly notificationsService: NotificationsService,
   ) { }
 
@@ -61,6 +60,13 @@ export class UsersService {
       type: "SYSTEM"
     })
     return sendResponse("success", "Đăng ký thành công", newUser);
+  }
+
+  async updateMoney(money: number, id: string){
+    await this.userModel.updateOne(
+      {_id: id}, 
+      { $inc: { money: money } }
+    )
   }
 
   findByEmail(username: string) {

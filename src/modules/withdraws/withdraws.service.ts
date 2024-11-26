@@ -4,12 +4,16 @@ import { UpdateWithdrawDto } from './dto/update-withdraw.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Withdraw } from './schemas/withdraw.schema';
-import { sendResponse } from 'src/config';
+import { CONFIG_ICON, sendResponse } from 'src/config';
+import { NotificationsService } from '../notifications/notifications.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class WithdrawsService {
   constructor(
     @InjectModel(Withdraw.name) private withdrawModel: Model<Withdraw>,
+    private readonly notificationsService: NotificationsService,
+    private readonly usersService: UsersService,
   ){}
 
   async findAll(status: string, user: string) {
@@ -42,7 +46,23 @@ export class WithdrawsService {
   }
 
   async approveWithdraw(id: ObjectId){
-    await this.withdrawModel.updateOne({_id: id}, {status: true})
+    const record = await this.withdrawModel.findByIdAndUpdate({_id: id}, {status: true})
+
+    /**
+     * THÔNG BÁO TỚI USER 
+     */
+    this.notificationsService.create("", CONFIG_ICON.WITHDRAW, `Lệnh rút ${record.money} đã được duyệt. Vui lòng kiểm tra tài khoản.`, record.user.toString())
     return sendResponse("success", "Duyệt thành công", null)
+  }
+
+  async refuseWithdraw(id: ObjectId){
+    const record = await this.withdrawModel.findByIdAndDelete({_id: id})
+    this.usersService.updateMoney(record.money, record.user.toString())
+
+    /**
+     * THÔNG BÁO TỚI USER 
+     */
+    this.notificationsService.create("", CONFIG_ICON.WITHDRAW, `Lệnh rút ${record.money} không được chấp thuận. Vui lòng thử lại sau.`, record.user.toString())
+    return sendResponse("success", "Xóa thành công", null)
   }
 }
