@@ -182,4 +182,16 @@ export class UsersService {
       return sendResponse("success", "Theo dõi thành công", null)
     }
   }
+
+  async updateRoleWhenDelete(id: string, newRole: string){
+    const affectedUsers = await this.userModel.find({ role: id })
+    await this.userModel.updateMany({role: id}, {role: newRole})
+
+    /**
+     * THÔNG BÁO TỚI TẤT CẢ CÁC USER BỊ CẬP NHẬT QUYỀN
+     */
+    for (const user of affectedUsers) {
+      await this.notificationsService.create("", CONFIG_ICON.SYSTEM, "Hệ thông đã cập nhật quyền <b>BASIC</b> cho bạn", user._id.toString())
+    }
+  }
 }

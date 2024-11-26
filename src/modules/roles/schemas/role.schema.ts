@@ -11,12 +11,16 @@ export class Role {
     
     @Prop({
         type: [String],
-        enum: Object.values(CONFIG_PERMISSIONS).flatMap(Object.values)
+        enum: Object.values(CONFIG_PERMISSIONS).flatMap(Object.values),
+        default: []
     })
     permissions: string[]
 
     @Prop()
     description: string
+
+    @Prop({default: true})
+    canDelete: boolean
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);

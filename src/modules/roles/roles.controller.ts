@@ -2,34 +2,49 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { ObjectId } from 'mongoose';
+import { Require } from 'src/common/decorators/customise.decorator';
+import { CONFIG_PERMISSIONS } from 'src/config';
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  @Get('')
+  @Require(CONFIG_PERMISSIONS.ROLE.GET)
+  getListRole(){
+    return this.rolesService.getListRole()
   }
 
   @Get(':id')
-  findOne(@Param('id') id: ObjectId) {
-    return this.rolesService.findOne(id);
+  @Require(CONFIG_PERMISSIONS.ROLE.GET)
+  getDetailRole(
+    @Param('id') id: string
+  ){
+    return this.rolesService.getDetailRole(id)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
+  @Post('create')
+  @Require(CONFIG_PERMISSIONS.ROLE.CREATE)
+  createRole(
+    @Body() createRoleDto: CreateRoleDto
+  ){
+    return this.rolesService.createRole(createRoleDto)
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
+  @Delete('delete/:id')
+  @Require(CONFIG_PERMISSIONS.ROLE.DELETE)
+  deleteRole(
+    @Param('id') id: string
+  ){
+    return this.rolesService.deleteRole(id)
+  }
+
+  @Patch('edit/:id')
+  @Require(CONFIG_PERMISSIONS.ROLE.DELETE)
+  editRole(
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto
+  ){
+    return this.rolesService.editRole(id, updateRoleDto)
   }
 }
