@@ -9,7 +9,6 @@ import { genSaltSync, hashSync } from 'bcryptjs';
 import { CONFIG_ICON, sendResponse } from 'src/config';
 import { IUser } from './users.interface';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { AuthService } from '../auth/auth.service';
 import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
@@ -17,7 +16,6 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly cloudinaryService: CloudinaryService,
-    @Inject(forwardRef(() => AuthService))
     private readonly notificationsService: NotificationsService,
   ) { }
 

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { User } from 'src/common/decorators/customise.decorator';
+import { IUser } from '../users/users.interface';
 
 /**
  * CÁC TRƯỜNG HỢP THÔNG BÁO
@@ -19,4 +21,27 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
+  @Get('')
+  getListNotification(
+    @User() user: IUser
+  ){
+    return this.notificationsService.getListNotification(user)
+  }
+
+  @Post('read/:id')
+  @HttpCode(HttpStatus.OK)
+  readNotification(
+    @Param('id') id: string,
+    @User() user: IUser
+  ){
+    return this.notificationsService.readNotification(id, user)
+  }
+
+  @Post('read-all')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  readAllNotification(
+    @User() user: IUser
+  ){
+    return this.notificationsService.readAllNotification(user)
+  }
 }
