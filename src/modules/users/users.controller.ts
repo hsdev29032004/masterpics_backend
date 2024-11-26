@@ -65,4 +65,13 @@ export class UsersController {
   ){
     return this.usersService.follow(id, user)
   }
+
+  @Patch('update-role/:id')
+  @Require(CONFIG_PERMISSIONS.ROLE.UPDATE)
+  updateRole(
+    @Param('id') id: string,
+    @Body('role') role: string
+  ){
+    return this.usersService.updateRole(id, role)
+  }
 }

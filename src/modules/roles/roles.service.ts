@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Model, ObjectId } from 'mongoose';
@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service';
 export class RolesService {
   constructor(
     @InjectModel(Role.name) private rolemodel: Model<Role>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ){}
 

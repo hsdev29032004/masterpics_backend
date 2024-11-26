@@ -10,12 +10,16 @@ import { CONFIG_ICON, sendResponse } from 'src/config';
 import { IUser } from './users.interface';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { RolesService } from '../roles/roles.service';
+import { IRole } from '../roles/roles.interface';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly cloudinaryService: CloudinaryService,
+    @Inject(forwardRef(() => RolesService))
+    private readonly rolesService: RolesService,
     private readonly notificationsService: NotificationsService,
   ) { }
 
@@ -193,5 +197,20 @@ export class UsersService {
     for (const user of affectedUsers) {
       await this.notificationsService.create("", CONFIG_ICON.SYSTEM, "Hệ thông đã cập nhật quyền <b>BASIC</b> cho bạn", user._id.toString())
     }
+  }
+
+  async updateRole(idUser: string, role: string){
+    const roleRecord: IRole = await (await this.rolesService.getDetailRole(role)).data
+    if(!roleRecord){
+      throw new BadRequestException(sendResponse("error", "Không tồn tại quyền", null))
+    }
+
+    await this.userModel.updateOne({_id: idUser}, {role: role})
+    await this.notificationsService.create("", CONFIG_ICON.SYSTEM, `Hệ thông đã cập nhật quyền <b>${roleRecord.name}</b> cho bạn`, idUser)
+
+    const user = await this.userModel.findOne({_id: idUser})
+      .select("-password -refreshToken")
+      .populate("role")
+    return sendResponse("success", "Cập nhật quyền thành công", user)
   }
 }
