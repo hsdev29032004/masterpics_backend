@@ -15,9 +15,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import * as slug from 'mongoose-slug-updater';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './common/guards/jwt-auth.gaurd';
-import { PermissionsGuard } from './common/guards/permission.gaurd';
 import { SearchModule } from './modules/search/search.module';
 import { HelperModule } from './modules/helper/helper.module';
 

@@ -6,6 +6,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { Role, RoleSchema } from '../roles/schemas/role.schema';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { AuthModule } from '../auth/auth.module';
       { name: User.name, schema: UserSchema },
       { name: Role.name, schema: RoleSchema }
     ]),
-    forwardRef(() => AuthModule)
+    forwardRef(() => AuthModule),
+    NotificationsModule
   ],
   controllers: [UsersController],
   providers: [UsersService, CloudinaryService],

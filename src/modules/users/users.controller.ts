@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseInterceptors, BadRequestException, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Public, Require, User as UserDecorator } from 'src/common/decorators/customise.decorator';
 import { CONFIG_PERMISSIONS, sendResponse } from 'src/config';
@@ -55,5 +55,14 @@ export class UsersController {
     @UserDecorator() user: IUser
   ){
     return this.usersService.editUser(updateUserDto, avatar, user)
+  }
+
+  @Post("follow/:id")
+  @HttpCode(HttpStatus.OK)
+  follow(
+    @Param('id') id: ObjectId,
+    @UserDecorator() user: IUser,
+  ){
+    return this.usersService.follow(id, user)
   }
 }
