@@ -1,6 +1,6 @@
-import { Post } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Post } from 'src/modules/posts/schemas/post.schema';
 import { User } from 'src/modules/users/schemas/user.schema';
 
 export type FavoriteDocument = HydratedDocument<Favorite>;
