@@ -68,6 +68,11 @@ export class PostsService {
     return sendResponse("error", "Không tìm thấy bài viết", null)
   }
 
+  async findById(id: string){
+    const post = await this.postModel.findOne({ _id: id })
+    return post
+  }
+
   async findByIdUser(id: string) {
     const posts = await this.postModel.find({ user: id, deleted: false }).select("-image")
     return sendResponse("success", "Lấy bài viết thành công", posts)

@@ -2,33 +2,32 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { User } from 'src/common/decorators/customise.decorator';
+import { IUser } from '../users/users.interface';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  @Get('purchase')
+  getListPurchaseHistory(
+    @User() user: IUser
+  ){
+    return this.paymentsService.purchaseHistory(user)
   }
 
-  @Get()
-  findAll() {
-    return this.paymentsService.findAll();
+  @Get('sale')
+  getListSaleHistory(
+    @User() user: IUser
+  ){
+    return this.paymentsService.getListSaleHistory(user)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentsService.update(+id, updatePaymentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentsService.remove(+id);
+  @Post('buy/:id')
+  buyPicture(
+    @User() user: IUser,
+    @Param('id') id: string
+  ){
+    return this.paymentsService.buy(user, id)
   }
 }

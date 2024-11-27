@@ -75,6 +75,10 @@ export class UsersService {
     return this.userModel.findOne({ email: username }).populate({ path: "role" })
   }
 
+  findById(id: string) {
+    return this.userModel.findOne({ _id: id })
+  }
+
   findUserByToken(refresh_token: string) {
     return this.userModel.findOne({ refreshToken: refresh_token }).populate({ path: "role" })
   }

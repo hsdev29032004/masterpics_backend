@@ -57,7 +57,9 @@ mongoose.plugin(slug);
     PostsModule, 
     DepositsModule, 
     FavoritesModule, 
-    RolesModule, SearchModule, HelperModule
+    RolesModule, 
+    SearchModule, 
+    HelperModule
   ],
 })
 export class AppModule {}

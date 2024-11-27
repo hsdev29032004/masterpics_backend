@@ -1,22 +1,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { CONFIG_PERMISSIONS } from 'src/config';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Post } from 'src/modules/posts/schemas/post.schema';
+import { User } from 'src/modules/users/schemas/user.schema';
 
 export type PaymentDocument = HydratedDocument<Payment>;
 
-@Schema({collection: "payments"})
+@Schema({collection: "payments", timestamps: true})
 export class Payment {
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name})
+    buyer: mongoose.Schema.Types.ObjectId
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name})
+    seller: mongoose.Schema.Types.ObjectId
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: Post.name})
+    post: mongoose.Schema.Types.ObjectId
+
+    /**
+     * PHẢI LƯU CẢ GIÁ VÀ ẢNH VÌ KHI USER THAY ĐỔI GIÁ HOẶC ẢNH THÌ TRUY VẤN RA SẼ BỊ THAY ĐỔI THEO -> KHÔNG ĐÚNG LOGIC
+     */
     @Prop()
-    name: string
-    
-    @Prop({
-        type: [String],
-        enum: Object.values(CONFIG_PERMISSIONS).flatMap(Object.values)
-    })
-    permissions: string[]
+    price: number
 
     @Prop()
-    description: string
+    image: string
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
