@@ -59,4 +59,13 @@ export class AuthController {
     const refreshToken = request.cookies["refresh_token"] || request.headers["authorization"]?.split(" ")[1];
     return this.authService.refresh(refreshToken, response)
   }
+
+  //[POST]: /api/auth/check-access-token
+  @HttpCode(HttpStatus.OK)
+  @Public()
+  @Post('check-access-token')
+  checkToken(@Req() request: Request){
+    const accessToken = request.headers["authorization"]?.split(" ")[1] || request?.cookies?.["access_token"]
+    return this.authService.checkAccessToken(accessToken)
+  }
 }

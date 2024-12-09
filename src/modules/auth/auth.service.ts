@@ -63,7 +63,7 @@ export class AuthService {
     createRefreshToken = (payload: any) => {
         const refresh_token = this.jwtService.sign(payload, {
             secret: this.configService.get<string>("REFRESHTOKEN_SECRET_KEY"),
-            expiresIn: 525600 * 1000
+            expiresIn: 100 * 24 * 60 * 60
         })
         return refresh_token
     }
@@ -71,7 +71,7 @@ export class AuthService {
     createAccessToken = (payload: any) => {
         const access_token = this.jwtService.sign(payload, {
             secret: this.configService.get<string>("ACCESSTOKEN_SECRET_KEY"),
-            expiresIn: 300 * 1000
+            expiresIn: 15
         })
         return access_token
     }
@@ -97,20 +97,36 @@ export class AuthService {
                 response.clearCookie('refresh_token')
                 response.cookie('refresh_token', refresh_token, {
                     httpOnly: true,
-                    maxAge: this.configService.get<number>("REFRESHTOKEN_EXPIRE") * 24 * 60 * 60
+                    maxAge: this.configService.get<number>("REFRESHTOKEN_EXPIRE") * 1000
                 })
                 let access_token = this.createAccessToken(payload)
+                response.clearCookie('access_token')
+                response.cookie('access_token', access_token, {
+                    httpOnly: true,
+                    maxAge: this.configService.get<number>("ACCESSTOKEN_EXPIRE") * 1000
+                })
 
-                return {
+                return sendResponse("success", "Refresh thành công", {
                     access_token,
                     refresh_token,
                     user: payload
-                };
+                })
             } else {
                 throw new BadRequestException(sendResponse("error", "Refresh token không hợp lệ", null))
             }
         } catch (error) {
             throw new BadRequestException(sendResponse("error", "Refresh token không hợp lệ", null))
+        }
+    }
+
+    checkAccessToken = async (access_token: string) => {        
+        try {
+            const user = this.jwtService.verify(access_token, {
+                secret: this.configService.get<string>("ACCESSTOKEN_SECRET_KEY"),
+            })
+            return sendResponse("success", "Xác thực thành công", user)
+        } catch (error) {
+            return sendResponse("error", "Access token không hợp lệ", null)
         }
     }
 }

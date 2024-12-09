@@ -16,8 +16,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
              * nếu không có thì lấy từ bearer
              * VÌ CÓ THỂ LÀ CLIENT ACTION HOẶC SERVER ACTION CỦA NEXTJS
              */
-            jwtFromRequest: ExtractJwt.fromExtractors([(req: Request) => {
-                return req?.cookies?.["access_token"] || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+            jwtFromRequest: ExtractJwt.fromExtractors([(req: Request) => {                
+                return req?.cookies?.["access_token"] || req.headers["authorization"]?.split(" ")[1];
             }]),
             ignoreExpiration: false,
             secretOrKey: configService.get<string>("ACCESSTOKEN_SECRET_KEY"),
