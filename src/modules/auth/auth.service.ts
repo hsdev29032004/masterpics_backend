@@ -32,7 +32,7 @@ export class AuthService {
         user: IUser,
         response: any,
     ) {
-        if(user.banned){
+        if (user.banned) {
             return sendResponse("error", "Tài khoản bị cấm", null)
         }
         let access_token = this.createAccessToken(user)
@@ -71,7 +71,7 @@ export class AuthService {
     createAccessToken = (payload: any) => {
         const access_token = this.jwtService.sign(payload, {
             secret: this.configService.get<string>("ACCESSTOKEN_SECRET_KEY"),
-            expiresIn: 15
+            expiresIn: 300
         })
         return access_token
     }
@@ -119,7 +119,7 @@ export class AuthService {
         }
     }
 
-    checkAccessToken = async (access_token: string) => {        
+    checkAccessToken = async (access_token: string) => {
         try {
             const user = this.jwtService.verify(access_token, {
                 secret: this.configService.get<string>("ACCESSTOKEN_SECRET_KEY"),
@@ -128,5 +128,31 @@ export class AuthService {
         } catch (error) {
             return sendResponse("error", "Access token không hợp lệ", null)
         }
+    }
+
+    googleLoginCallback = async (user: any, res: Response) => {
+        const fullName = user.lastName + user.firstName
+        const info = await this.usersService.createGoogleUser(user.email, fullName, user.picture)
+        
+        if (info.banned) {
+            return sendResponse("error", "Tài khoản bị cấm", null)
+        }
+        const userObject = info.toObject ? info.toObject() : info
+
+        let access_token = this.createAccessToken(userObject)
+        let refresh_token = this.createRefreshToken(userObject)
+
+        await this.usersService.updateUserToken(refresh_token, info._id.toString())
+
+        res.cookie('access_token', access_token, {
+            httpOnly: true,
+            maxAge: this.configService.get<number>("ACCESSTOKEN_EXPIRE") * 1000
+        })
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            maxAge: this.configService.get<number>("REFRESHTOKEN_EXPIRE") * 1000
+        })
+
+        return res.redirect(process.env.FE_DOMAIN)
     }
 }

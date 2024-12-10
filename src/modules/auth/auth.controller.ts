@@ -1,10 +1,11 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFile, UseGuards, Res, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, UseGuards, Res, Req, HttpCode, HttpStatus, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from 'src/common/guards/local-auth.gaurd';
 import { Public, User } from 'src/common/decorators/customise.decorator';
 import { Request, Response } from 'express';
 import { RegisterUserDto } from '../users/dto/create-user.dto';
 import { IUser } from '../users/users.interface';
+import { GoogleAuthGuard } from 'src/common/guards/google-auth.gaurd';
 // import { CloudinaryService } from '../cloudinary/cloudinary.service';
 // import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -37,7 +38,7 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  async register(@Body() registerUserDto: RegisterUserDto){
+  async register(@Body() registerUserDto: RegisterUserDto) {
     return this.authService.register(registerUserDto)
   }
 
@@ -64,8 +65,21 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('check-access-token')
-  checkToken(@Req() request: Request){
+  checkToken(@Req() request: Request) {
     const accessToken = request.headers["authorization"]?.split(" ")[1] || request?.cookies?.["access_token"]
     return this.authService.checkAccessToken(accessToken)
+  }
+
+  @Get('google')
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  googleLogin() {
+  }
+
+  @Get('google/callback')
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  googleLoginCallback(@Req() req: Request, @Res() res: Response) {
+    return this.authService.googleLoginCallback(req.user, res)
   }
 }

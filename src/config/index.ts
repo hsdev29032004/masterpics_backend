@@ -39,7 +39,7 @@ const CONFIG_PERMISSIONS = {
 
 const CONFIG_ACCOUNT_TYPE = {
     SYSTEM: "SYSTEM",
-    GMAIL: "GMAIL"
+    GMAIL: "GOOGLE"
 }
 
 const CONFIG_ICON = {

@@ -64,6 +64,33 @@ export class UsersService {
     return sendResponse("success", "Đăng ký thành công", newUser);
   }
 
+  async createGoogleUser(email: string, fullName: string, avatar: string){    
+    if(!email || !fullName ){
+      throw new BadRequestException(
+        sendResponse("error", "Thiếu thông tin", null)
+      )
+    }
+    const user = await this.userModel.findOne({ email, type: "GOOGLE" })
+      .select("-follow -refreshToken")
+      .populate("role")
+    if(!user){
+      const newUser = await this.userModel.create({
+        email,
+        fullName,
+        avatar,
+        type: "GOOGLE"
+      })
+
+      const populatedUser = await this.userModel
+      .findById(newUser._id)
+      .select("-follow -refreshToken")
+      .populate("role")
+
+      return populatedUser
+    }
+    return user
+  }
+
   async updateMoney(money: number, id: string){
     await this.userModel.updateOne(
       {_id: id}, 
