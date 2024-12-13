@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
-import { JwtAuthGuard } from './common/guards/jwt-auth.gaurd';
-import { PermissionsGuard } from './common/guards/permission.gaurd';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { PermissionsGuard } from './common/guards/permission.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

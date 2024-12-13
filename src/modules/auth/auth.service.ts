@@ -131,7 +131,7 @@ export class AuthService {
     }
 
     googleLoginCallback = async (user: any, res: Response) => {
-        const fullName = user.lastName + user.firstName
+        const fullName = user.lastName + " " + user.firstName
         const info = await this.usersService.createGoogleUser(user.email, fullName, user.picture)
         
         if (info.banned) {

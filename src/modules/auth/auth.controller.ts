@@ -1,26 +1,17 @@
 import { Controller, Post, Body, UseInterceptors, UploadedFile, UseGuards, Res, Req, HttpCode, HttpStatus, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from 'src/common/guards/local-auth.gaurd';
+import { LocalAuthGuard } from 'src/common/guards/local-auth.guard';
 import { Public, User } from 'src/common/decorators/customise.decorator';
 import { Request, Response } from 'express';
 import { RegisterUserDto } from '../users/dto/create-user.dto';
 import { IUser } from '../users/users.interface';
-import { GoogleAuthGuard } from 'src/common/guards/google-auth.gaurd';
-// import { CloudinaryService } from '../cloudinary/cloudinary.service';
-// import { FileInterceptor } from '@nestjs/platform-express';
+import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    // private readonly cloudinaryService: CloudinaryService
   ) { }
-
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // uploadImage(@UploadedFile() file: Express.Multer.File) {
-  //   return this.cloudinaryService.uploadFile(file);
-  // }
 
   // [POST]: /api/auth/login
   @Public()
