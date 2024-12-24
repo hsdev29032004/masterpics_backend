@@ -244,4 +244,15 @@ export class UsersService {
       .populate("role")
     return sendResponse("success", "Cập nhật quyền thành công", user)
   }
+
+  async myProfile(user: IUser){
+    const data = await this.userModel.findOne({_id: user._id})
+      .select("-password -refreshToken")
+      .populate("role")
+      .populate({
+        path: "follow",
+        select: "fullName slug avatar"
+      })
+    return sendResponse("success", "Lấy thông tin thành công", data)
+  }
 }

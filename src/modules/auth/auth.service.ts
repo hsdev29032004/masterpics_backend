@@ -112,10 +112,10 @@ export class AuthService {
                     user: payload
                 })
             } else {
-                throw new BadRequestException(sendResponse("error", "Refresh token không hợp lệ", null))
+                throw new BadRequestException(sendResponse("error", "Vui lòng đăng nhập", null))
             }
         } catch (error) {
-            throw new BadRequestException(sendResponse("error", "Refresh token không hợp lệ", null))
+            throw new BadRequestException(sendResponse("error", "Vui lòng đăng nhập", null))
         }
     }
 

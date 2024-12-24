@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseInterceptors, BadRequestException, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
-import { Model, ObjectId } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongoose';
 import { Public, Require, User as UserDecorator } from 'src/common/decorators/customise.decorator';
 import { CONFIG_PERMISSIONS, sendResponse } from 'src/config';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -12,7 +11,6 @@ import { IUser } from './users.interface';
 @Controller('users')
 export class UsersController {
   constructor(
-    @InjectModel(User.name) private postModel: Model<User>,
     private readonly usersService: UsersService
   ) {}
 
@@ -20,6 +18,13 @@ export class UsersController {
   @Require(CONFIG_PERMISSIONS.USER.GET)
   getAllUser(){
     return this.usersService.getAllUser()
+  }
+
+  @Get('my-profile')
+  myProfile(
+    @UserDecorator() user: IUser
+  ){
+    return this.usersService.myProfile(user)
   }
 
   @Get(':slug')

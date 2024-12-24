@@ -61,7 +61,12 @@ export class PostsService {
   }
 
   async findByslug(slug: string) {
-    const post = await this.postModel.findOne({ slug: slug, deleted: false }).select("-image")
+    const post = await this.postModel.findOne({ slug: slug, deleted: false })
+      .select("-image")
+      .populate({
+        path: "user",
+        select: "avatar fullName slug"
+      })
     if (post) {
       return sendResponse("success", "Lấy bài viết thành công", post)
     }
@@ -86,6 +91,10 @@ export class PostsService {
 
     if (!image) {
       throw new BadRequestException(sendResponse("error", "Chưa tải ảnh lên", null))
+    }
+
+    if(price<0){
+      throw new BadRequestException(sendResponse("error", "Giá phải lớn hơn 0", null))
     }
 
     const originalImageResult = await this.cloudinaryService.uploadFile(image);
@@ -191,7 +200,7 @@ export class PostsService {
 
   async deletePost(id: string, user: IUser) {
     let post = await this.postModel.findOne({ _id: id })
-    if (post) {
+    if (post && post.deleted == false) {
       if (user._id == post.user.toString()) {
         post.deleted = true
         await post.save()
