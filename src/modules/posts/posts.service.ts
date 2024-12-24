@@ -136,7 +136,7 @@ export class PostsService {
      * TRIGGER TẠO THÔNG BÁO CHO NGƯỜI THEO DÕI KHI ĐĂNG BÀI
      */
 
-    return sendResponse("success", "Tạo mới bài viết thành công", post)
+    return this.findByslug(post.slug)
   }
 
   async editPost(updatePostDto: UpdatePostDto, image: Express.Multer.File, user: IUser, id: string) {
